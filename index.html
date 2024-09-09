@@ -34,10 +34,9 @@
             position: relative;
             user-select: none;
             height: var(--fret-height, 40px);
-            
         }
         
-         .fret::before {
+        .fret::before {
             content: '';
             position: absolute;
             width: 98%;
@@ -47,7 +46,6 @@
             transform: translateY(-50%);
         }
         
-
         .fret.highlight {
             background-color: #FFD700;
         }
@@ -219,15 +217,12 @@
             }
         }
 
-        function initializeAudioContext() {
-            Tone.start().then(() => {
-                document.body.removeEventListener('touchstart', initializeAudioContext);
-                document.body.removeEventListener('mousedown', initializeAudioContext);
-            });
+        function handleMouseMove(event, fretDiv, midiNote) {
+            if (event.buttons > 0) { // Check if mouse button is pressed
+                document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note}`;
+                startNote(midiNote);
+            }
         }
-
-        document.body.addEventListener('touchstart', initializeAudioContext);
-        document.body.addEventListener('mousedown', initializeAudioContext);
 
         function renderFretboard() {
             const fretboard = document.getElementById('fretboard');
@@ -245,6 +240,8 @@
                     fretDiv.classList.add('fret');
                     fretDiv.style.width = getFretWidth(fret);
                     fretDiv.style.height = `${fretDimensions.height}px`;
+                    fretDiv.dataset.string = tuningStandard.length - stringIndex;
+                    fretDiv.dataset.fret = fret;
 
                     if (fret === 0) {
                         fretDiv.classList.add('fret-0');
@@ -256,6 +253,7 @@
 
                     const midiNote = Tone.Frequency(stringNote).transpose(fret).toNote();
                     const flatNote = getFlatEquivalent(midiNote);
+                    fretDiv.dataset.note = flatNote;
 
                     if (displayOption === 'dots') {
                         const dotSpan = document.createElement('span');
@@ -272,18 +270,20 @@
                         noteSpan.classList.add('note', 'show-notes');
                         noteSpan.innerText = flatNote;
                         fretDiv.appendChild(noteSpan);
-        
+            
                     } else if (displayOption === 'notes2') {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
                         noteSpan.innerText = midiNote;
                         fretDiv.appendChild(noteSpan);
                     }
+
                     fretDiv.addEventListener('mousedown', () => {
                         document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`;
                         startNote(midiNote);
                     });
 
+                    fretDiv.addEventListener('mousemove', (event) => handleMouseMove(event, fretDiv, midiNote));
                     fretDiv.addEventListener('mouseup', stopNote);
                     fretDiv.addEventListener('mouseleave', stopNote);
                     fretDiv.addEventListener('touchstart', () => {
@@ -309,7 +309,6 @@
         document.getElementById('stringOrder').addEventListener('change', renderFretboard);
         document.getElementById('displayOption').addEventListener('change', renderFretboard);
     </script>
-
 <a target=_new href=https://www.musicca.com/metronome>https://www.musicca.com/metronome</a>
 </body>
 </html>
