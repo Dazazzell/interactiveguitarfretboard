@@ -40,16 +40,6 @@
             border-right: none;
         }
 
-        .fret::before {
-            content: '';
-            position: absolute;
-            width: 98%;
-            height: 1px;
-            border-top: 1px dashed #000;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
         .fret.highlight {
             background-color: #FFD700;
         }
@@ -211,6 +201,14 @@
 
         document.body.addEventListener('touchstart', startAudio);
 
+        // Create the Tone.js synth
+        const synth = new Tone.Synth().toDestination();
+
+        // Function to play a note
+        function playNote(note) {
+            synth.triggerAttackRelease(note, '8n');
+        }
+
         function renderFretboard() {
             const fretboard = document.getElementById('fretboard');
             fretboard.innerHTML = '';
@@ -231,6 +229,13 @@
                     }
                     fretDiv.style.width = getFretWidth(fret);
                     fretDiv.style.height = `${fretDimensions.height}px`;
+
+                    // Add event listener to play note when clicked
+                    fretDiv.addEventListener('mousedown', () => playNote(Tone.Frequency(stringTuning).transpose(fret).toNote()));
+                    fretDiv.addEventListener('touchstart', () => {
+                        startAudio();
+                        playNote(Tone.Frequency(stringTuning).transpose(fret).toNote());
+                    });
 
                     stringDiv.appendChild(fretDiv);
                 }
