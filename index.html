@@ -35,6 +35,10 @@
             user-select: none;
             height: var(--fret-height, 40px);
         }
+
+        .fret.hide-right-border {
+            border-right: none;
+        }
         
         .fret::before {
             content: '';
@@ -45,7 +49,7 @@
             top: 50%;
             transform: translateY(-50%);
         }
-        
+
         .fret.highlight {
             background-color: #FFD700;
         }
@@ -145,6 +149,10 @@
                 <option value="notes1">Note Names Flat</option>
                 <option value="notes2">Note Names Sharp</option>
             </select>
+        </label>
+        <label>
+            Hide Frets:
+            <input type="checkbox" id="hideRightBorder" checked>
         </label>
     </div>
 
@@ -314,6 +322,15 @@
 
                 fretboard.appendChild(stringDiv);
             });
+
+            // Apply the right border hiding based on the checkbox state
+            const hideBorderCheckbox = document.getElementById('hideRightBorder');
+            const fretDivs = document.querySelectorAll('.fret');
+            if (hideBorderCheckbox.checked) {
+                fretDivs.forEach(fret => fret.classList.add('hide-right-border'));
+            } else {
+                fretDivs.forEach(fret => fret.classList.remove('hide-right-border'));
+            }
         }
 
         renderFretboard();
@@ -323,7 +340,8 @@
         document.getElementById('fretHeight').addEventListener('input', updateFretDimensions);
         document.getElementById('stringOrder').addEventListener('change', renderFretboard);
         document.getElementById('displayOption').addEventListener('change', renderFretboard);
+        document.getElementById('hideRightBorder').addEventListener('change', renderFretboard);
     </script>
-<a target=_new href=https://www.musicca.com/metronome>https://www.musicca.com/metronome</a>
 </body>
+<a target=_new href=https://www.musicca.com/metronome>https://www.musicca.com/metronome</a>
 </html>
