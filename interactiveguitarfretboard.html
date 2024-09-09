@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guitar Fretboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .fretboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .string {
+            display: flex;
+        }
+
+        .fret {
+            height: 50px;
+            border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: #f0f0f0; /* Default fret color */
+            position: relative;
+        }
+
+        .fret.highlight {
+            background-color: #FFD700; /* Highlighted frets (0, 3, 5, 7, 9, 15, 17, 19, 21) */
+        }
+
+        .fret.fret-12 {
+            background-color: #FF6347; /* Unique color for fret 12 */
+        }
+
+        .fret.fret-0 {
+            background-color: #333; /* Dark grey color for fret 0 */
+            color: #fff; /* White color for dot text in dark background */
+        }
+
+        /* Hide fret numbers initially and display them on hover */
+        .fret .number {
+            visibility: hidden;
+        }
+
+        .fret:hover .number {
+            visibility: visible;
+        }
+
+        /* Dot for default state */
+        .fret::before {
+            content: '•';
+            position: absolute;
+            font-size: 20px;
+            color: #555;
+        }
+
+        .fret:hover::before {
+            content: '';
+        }
+
+        .fret:hover {
+            background-color: #ddd;
+        }
+
+        .note-display {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        /* Style for the input fields */
+        .inputs {
+            margin-bottom: 20px;
+        }
+
+        .inputs label {
+            display: block;
+            margin: 5px 0;
+        }
+
+        .inputs input {
+            width: 60px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Interactive Guitar Fretboard</h1>
+
+    <div class="inputs" id="inputs">
+        <label for="fret0">Fret 0 Width (px): <input type="number" id="fret0" value="30"></label>
+        <label for="fret1">Fret 1 Width (px): <input type="number" id="fret1" value="100"></label>
+        <!-- Add additional inputs for other frets as needed -->
+    </div>
+
+    <div class="fretboard" id="fretboard"></div>
+    <div class="note-display" id="noteDisplay">Click and hold a fret to play the note!</div>
+
+    <script>
+        const tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']; // Standard guitar tuning in MIDI octave notation
+        const frets = 21; // Number of frets
+        const highlightFrets = [0, 3, 5, 7, 9, 15, 17, 19, 21]; // Frets with special color
+        const specialFret12 = 12; // Fret 12 with unique color
+
+        // Object to hold the width of each fret
+        const fretWidths = {
+            0: parseInt(document.getElementById('fret0').value) || 30,
+            1: parseInt(document.getElementById('fret1').value) || 100,
+        };
+
+        // Function to get the width of a specific fret
+        function getFretWidth(fret) {
+            if (fret === 0) {
+                return `${fretWidths[0]}px`;
+            }
+            if (fret === 1) {
+                return `${fretWidths[1]}px`;
+            }
+            return `${fretWidths[1] * Math.pow(1 / 1.06, fret - 1)}px`;
+        }
+
+        // Update fret widths based on input values
+        function updateFretWidths() {
+            fretWidths[0] = parseInt(document.getElementById('fret0').value) || 30;
+            fretWidths[1] = parseInt(document.getElementById('fret1').value) || 100;
+            renderFretboard(); // Re-render fretboard with updated widths
+        }
+
+        // Create a synth using Tone.js
+        const synth = new Tone.Synth().toDestination();
+        let currentNote = null; // To keep track of the currently playing note
+
+        // Function to play the correct note using Tone.js
+        function startNote(note) {
+            if (currentNote) {
+                synth.triggerRelease(); // Release any note currently playing
+            }
+            currentNote = note;
+            synth.triggerAttack(note); // Start playing the note
+        }
+
+        // Function to stop the currently playing note
+        function stopNote() {
+            if (currentNote) {
+                synth.triggerRelease(); // Stop the note
+                currentNote = null;
+            }
+        }
+
+        // Create fretboard
+        function renderFretboard() {
+            const fretboard = document.getElementById('fretboard');
+            fretboard.innerHTML = ''; // Clear existing fretboard
+
+            tuning.slice().reverse().forEach((stringNote, stringIndex) => {
+                const stringDiv = document.createElement('div');
+                stringDiv.classList.add('string');
+
+                for (let fret = 0; fret <= frets; fret++) {
+                    const fretDiv = document.createElement('div');
+                    fretDiv.classList.add('fret');
+                    fretDiv.style.width = getFretWidth(fret); // Set width based on fret number
+
+                    // Apply different colors based on fret numbers
+                    if (fret === 0) {
+                        fretDiv.classList.add('fret-0');
+                    } else if (highlightFrets.includes(fret)) {
+                        fretDiv.classList.add('highlight');
+                    } else if (fret === specialFret12) {
+                        fretDiv.classList.add('fret-12');
+                    }
+
+                    // Calculate the note at this string and fret
+                    const midiNote = Tone.Frequency(stringNote).transpose(fret).toNote(); // Get the correct note using Tone.js
+
+                    // Create a span for the fret number and hide it by default
+                    const numberSpan = document.createElement('span');
+                    numberSpan.classList.add('number');
+                    numberSpan.innerText = fret; // Show fret number
+                    fretDiv.appendChild(numberSpan);
+
+                    // Add mouse events to start and stop the note
+                    fretDiv.addEventListener('mousedown', () => {
+                        noteDisplay.innerText = `String: ${tuning.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
+                        startNote(midiNote); // Start playing the correct note
+                    });
+
+                    fretDiv.addEventListener('mouseup', stopNote); // Stop playing the note
+                    fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
+
+                    stringDiv.appendChild(fretDiv);
+                }
+
+                fretboard.appendChild(stringDiv);
+            });
+        }
+
+        // Initialize fretboard
+        renderFretboard();
+
+        // Update fretboard when input values change
+        document.getElementById('fret0').addEventListener('input', updateFretWidths);
+        document.getElementById('fret1').addEventListener('input', updateFretWidths);
+        // Add event listeners for additional frets if needed
+
+    </script>
+
+</body>
+</html>
