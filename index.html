@@ -59,12 +59,10 @@
             color: #fff;
         }
 
-        /* Hide display elements by default */
         .fret .dot, .fret .number, .fret .note {
             visibility: hidden;
         }
 
-        /* Show specific display element on hover based on the selected option */
         .fret:hover .dot.show-dots {
             visibility: visible;
         }
@@ -201,6 +199,7 @@
 
         const synth = new Tone.Synth().toDestination();
         let currentNote = null;
+        let lastNote = null;
 
         function startNote(note) {
             if (currentNote) {
@@ -219,8 +218,11 @@
 
         function handleMouseMove(event, fretDiv, midiNote) {
             if (event.buttons > 0) { // Check if mouse button is pressed
-                document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note}`;
-                startNote(midiNote);
+                if (midiNote !== lastNote) {
+                    document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note}`;
+                    startNote(midiNote);
+                    lastNote = midiNote;
+                }
             }
         }
 
@@ -270,7 +272,6 @@
                         noteSpan.classList.add('note', 'show-notes');
                         noteSpan.innerText = flatNote;
                         fretDiv.appendChild(noteSpan);
-            
                     } else if (displayOption === 'notes2') {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
@@ -281,18 +282,32 @@
                     fretDiv.addEventListener('mousedown', () => {
                         document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`;
                         startNote(midiNote);
+                        lastNote = midiNote;
                     });
 
                     fretDiv.addEventListener('mousemove', (event) => handleMouseMove(event, fretDiv, midiNote));
-                    fretDiv.addEventListener('mouseup', stopNote);
-                    fretDiv.addEventListener('mouseleave', stopNote);
+                    fretDiv.addEventListener('mouseup', () => {
+                        stopNote();
+                        lastNote = null; // Reset lastNote on mouse up
+                    });
+                    fretDiv.addEventListener('mouseleave', () => {
+                        stopNote();
+                        lastNote = null; // Reset lastNote on mouse leave
+                    });
                     fretDiv.addEventListener('touchstart', () => {
                         document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`;
                         startNote(midiNote);
+                        lastNote = midiNote;
                     }, { passive: true });
 
-                    fretDiv.addEventListener('touchend', stopNote);
-                    fretDiv.addEventListener('touchcancel', stopNote);
+                    fretDiv.addEventListener('touchend', () => {
+                        stopNote();
+                        lastNote = null; // Reset lastNote on touch end
+                    });
+                    fretDiv.addEventListener('touchcancel', () => {
+                        stopNote();
+                        lastNote = null; // Reset lastNote on touch cancel
+                    });
 
                     stringDiv.appendChild(fretDiv);
                 }
