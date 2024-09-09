@@ -10,6 +10,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
+            user-select: none; /* Prevent text selection on the entire page */
         }
 
         .fretboard {
@@ -32,6 +33,7 @@
             cursor: pointer;
             background-color: #f0f0f0; /* Default fret color */
             position: relative;
+            user-select: none; /* Prevent text selection on frets */
         }
 
         .fret.highlight {
@@ -209,9 +211,10 @@
 
                     fretDiv.addEventListener('mouseup', stopNote); // Stop playing the note
                     fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
-                    fretDiv.addEventListener('touchstart', () => {
+                    fretDiv.addEventListener('touchstart', (event) => {
                         noteDisplay.innerText = `String: ${tuning.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
                         startNote(midiNote); // Start playing the correct note
+                        event.preventDefault(); // Prevent default touch behavior to avoid text selection
                     }, { passive: true });
 
                     fretDiv.addEventListener('touchend', stopNote); // Stop playing the note
