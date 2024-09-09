@@ -139,6 +139,26 @@
             return `${fretDimensions.width[1] * Math.pow(1 / 1.06, fret - 1)}px`;
         }
 
+        // Function to get the flat equivalent of a note
+        function getFlatEquivalent(note) {
+            const noteToFlat = {
+                'C#1': 'Db1', 'D#1': 'Eb1', 'F#1': 'Gb1', 'G#1': 'Ab1', 'A#1': 'Bb1',
+                'Db1': 'C#1', 'Eb1': 'D#1', 'Gb1': 'F#1', 'Ab1': 'G#1', 'Bb1': 'A#1',
+                'C#2': 'Db2', 'D#2': 'Eb2', 'F#2': 'Gb2', 'G#2': 'Ab2', 'A#2': 'Bb2',
+                'Db2': 'C#2', 'Eb2': 'D#2', 'Gb2': 'F#2', 'Ab2': 'G#2', 'Bb2': 'A#2',
+                'C#3': 'Db3', 'D#3': 'Eb3', 'F#3': 'Gb3', 'G#3': 'Ab3', 'A#3': 'Bb3',
+                'Db3': 'C#3', 'Eb3': 'D#3', 'Gb3': 'F#3', 'Ab3': 'G#3', 'Bb3': 'A#3',
+                'C#4': 'Db4', 'D#4': 'Eb4', 'F#4': 'Gb4', 'G#4': 'Ab4', 'A#4': 'Bb4',
+                'Db4': 'C#4', 'Eb4': 'D#4', 'Gb4': 'F#4', 'Ab4': 'G#4', 'Bb4': 'A#4',
+                'C#5': 'Db5', 'D#5': 'Eb5', 'F#5': 'Gb5', 'G#5': 'Ab5', 'A#5': 'Bb5',
+                'Db5': 'C#5', 'Eb5': 'D#5', 'Gb5': 'F#5', 'Ab5': 'G#5', 'Bb5': 'A#5',
+                'C#6': 'Db6', 'D#6': 'Eb6', 'F#6': 'Gb6', 'G#6': 'Ab6', 'A#6': 'Bb6',
+                'Db6': 'C#6', 'Eb6': 'D#6', 'Gb6': 'F#6', 'Ab6': 'G#6', 'Bb6': 'A#6'
+                
+            };
+            return noteToFlat[note] || note;
+        }
+
         // Update fret dimensions based on input values
         function updateFretDimensions() {
             fretDimensions.width[0] = parseInt(document.getElementById('fret0').value) || 30;
@@ -208,6 +228,7 @@
 
                     // Calculate the note at this string and fret
                     const midiNote = Tone.Frequency(stringNote).transpose(fret).toNote(); // Get the correct note using Tone.js
+                    const flatNote = getFlatEquivalent(midiNote); // Get the flat equivalent
 
                     // Create a span for the fret number and hide it by default
                     const numberSpan = document.createElement('span');
@@ -217,14 +238,14 @@
 
                     // Add mouse and touch events to start and stop the note
                     fretDiv.addEventListener('mousedown', () => {
-                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
+                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
                         startNote(midiNote); // Start playing the correct note
                     });
 
                     fretDiv.addEventListener('mouseup', stopNote); // Stop playing the note
                     fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
                     fretDiv.addEventListener('touchstart', () => {
-                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
+                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
                         startNote(midiNote); // Start playing the correct note
                     }, { passive: true });
 
