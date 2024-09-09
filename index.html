@@ -157,6 +157,18 @@
             }
         }
 
+        // Function to initialize Tone.js audio context
+        function initializeAudioContext() {
+            Tone.start().then(() => {
+                document.body.removeEventListener('touchstart', initializeAudioContext); // Remove listener once audio context is initialized
+                document.body.removeEventListener('mousedown', initializeAudioContext); // Remove listener once audio context is initialized
+            });
+        }
+
+        // Add listeners to initialize Tone.js context
+        document.body.addEventListener('touchstart', initializeAudioContext);
+        document.body.addEventListener('mousedown', initializeAudioContext);
+
         // Create fretboard
         function renderFretboard() {
             const fretboard = document.getElementById('fretboard');
@@ -189,7 +201,7 @@
                     numberSpan.innerText = fret; // Show fret number
                     fretDiv.appendChild(numberSpan);
 
-                    // Add mouse events to start and stop the note
+                    // Add mouse and touch events to start and stop the note
                     fretDiv.addEventListener('mousedown', () => {
                         noteDisplay.innerText = `String: ${tuning.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
                         startNote(midiNote); // Start playing the correct note
@@ -197,6 +209,13 @@
 
                     fretDiv.addEventListener('mouseup', stopNote); // Stop playing the note
                     fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
+                    fretDiv.addEventListener('touchstart', () => {
+                        noteDisplay.innerText = `String: ${tuning.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
+                        startNote(midiNote); // Start playing the correct note
+                    }, { passive: true });
+
+                    fretDiv.addEventListener('touchend', stopNote); // Stop playing the note
+                    fretDiv.addEventListener('touchcancel', stopNote); // Stop playing if touch is canceled
 
                     stringDiv.appendChild(fretDiv);
                 }
