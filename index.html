@@ -10,7 +10,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
-            user-select: none; /* Prevent text selection on the entire page */
+            user-select: none;
         }
 
         .fretboard {
@@ -30,47 +30,61 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            background-color: #f0f0f0; /* Default fret color */
+            background-color: #f0f0f0;
             position: relative;
-            user-select: none; /* Prevent text selection on frets */
-            height: var(--fret-height, 40px); /* Use CSS variable for fret height */
+            user-select: none;
+            height: var(--fret-height, 40px);
         }
 
         .fret.highlight {
-            background-color: #FFD700; /* Highlighted frets (0, 3, 5, 7, 9, 15, 17, 19, 21) */
+            background-color: #FFD700;
         }
 
         .fret.fret-12 {
-            background-color: #FF6347; /* Unique color for fret 12 */
+            background-color: #FF6347;
         }
 
         .fret.fret-0 {
-            background-color: #333; /* Dark grey color for fret 0 */
-            color: #fff; /* White color for dot text in dark background */
+            background-color: #333;
+            color: #fff;
         }
 
-        /* Hide fret numbers and display dots */
-        .fret .number {
-            visibility: hidden; /* Hide fret number by default */
+        /* Hide display elements by default */
+        .fret .dot, .fret .number, .fret .note {
+            visibility: hidden;
         }
 
-        .fret::before {
-            content: '•'; /* Dot for default state */
+        /* Show specific display element on hover based on the selected option */
+        .fret:hover .dot.show-dots {
+            visibility: visible;
+        }
+
+        .fret:hover .number.show-numbers {
+            visibility: visible;
+        }
+
+        .fret:hover .note.show-notes {
+            visibility: visible;
+        }
+
+        .fret:hover {
+            background-color: #ddd;
+        }
+
+        .fret .dot {
             position: absolute;
             font-size: 20px;
             color: #555;
         }
 
-        .fret:hover .number {
-            visibility: hidden; /* Hide fret number on hover */
+        .fret .number {
+            font-size: 16px;
+            color: #000;
         }
 
-        .fret:hover::before {
-            content: '•'; /* Display dot on hover */
-        }
-
-        .fret:hover {
-            background-color: #ddd;
+        .fret .note {
+            font-size: 16px;
+            color: #000;
         }
 
         .note-display {
@@ -78,7 +92,6 @@
             font-size: 20px;
         }
 
-        /* Style for the input fields */
         .inputs {
             margin-top: 20px;
         }
@@ -91,6 +104,11 @@
         .inputs input, .inputs select {
             width: 60px;
             margin-right: 10px;
+        }
+
+        .inputs input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -111,24 +129,31 @@
                 <option value="standard">Standard (E2 to E4)</option>
             </select>
         </label>
+        <label>
+            Show:
+            <select id="displayOption">
+                <option value="dots" selected>Dots</option>
+                <option value="numbers">Fret Numbers</option>
+                <option value="notes1">Note Names Flat</option>
+                <option value="notes2">Note Names Sharp</option>
+            </select>
+        </label>
     </div>
 
     <script>
-        const tuningStandard = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']; // Standard guitar tuning in MIDI octave notation
-        const frets = 21; // Number of frets
-        const highlightFrets = [0, 3, 5, 7, 9, 15, 17, 19, 21]; // Frets with special color
-        const specialFret12 = 12; // Fret 12 with unique color
+        const tuningStandard = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'];
+        const frets = 21;
+        const highlightFrets = [0, 3, 5, 7, 9, 15, 17, 19, 21];
+        const specialFret12 = 12;
 
-        // Object to hold the width and height of each fret
         const fretDimensions = {
             width: {
                 0: parseInt(document.getElementById('fret0').value) || 30,
                 1: parseInt(document.getElementById('fret1').value) || 100,
             },
-            height: parseInt(document.getElementById('fretHeight').value) || 40, // Default height set to 40px
+            height: parseInt(document.getElementById('fretHeight').value) || 40,
         };
 
-        // Function to get the width of a specific fret
         function getFretWidth(fret) {
             if (fret === 0) {
                 return `${fretDimensions.width[0]}px`;
@@ -139,7 +164,6 @@
             return `${fretDimensions.width[1] * Math.pow(1 / 1.06, fret - 1)}px`;
         }
 
-        // Function to get the flat equivalent of a note
         function getFlatEquivalent(note) {
             const noteToFlat = {
                 'C#1': 'Db1', 'D#1': 'Eb1', 'F#1': 'Gb1', 'G#1': 'Ab1', 'A#1': 'Bb1',
@@ -154,56 +178,49 @@
                 'Db5': 'C#5', 'Eb5': 'D#5', 'Gb5': 'F#5', 'Ab5': 'G#5', 'Bb5': 'A#5',
                 'C#6': 'Db6', 'D#6': 'Eb6', 'F#6': 'Gb6', 'G#6': 'Ab6', 'A#6': 'Bb6',
                 'Db6': 'C#6', 'Eb6': 'D#6', 'Gb6': 'F#6', 'Ab6': 'G#6', 'Bb6': 'A#6'
-                
             };
             return noteToFlat[note] || note;
         }
 
-        // Update fret dimensions based on input values
         function updateFretDimensions() {
             fretDimensions.width[0] = parseInt(document.getElementById('fret0').value) || 30;
             fretDimensions.width[1] = parseInt(document.getElementById('fret1').value) || 100;
             fretDimensions.height = parseInt(document.getElementById('fretHeight').value) || 40;
-            renderFretboard(); // Re-render fretboard with updated dimensions
+            renderFretboard();
         }
 
-        // Create a synth using Tone.js
         const synth = new Tone.Synth().toDestination();
-        let currentNote = null; // To keep track of the currently playing note
+        let currentNote = null;
 
-        // Function to play the correct note using Tone.js
         function startNote(note) {
             if (currentNote) {
-                synth.triggerRelease(); // Release any note currently playing
+                synth.triggerRelease();
             }
             currentNote = note;
-            synth.triggerAttack(note); // Start playing the note
+            synth.triggerAttack(note);
         }
 
-        // Function to stop the currently playing note
         function stopNote() {
             if (currentNote) {
-                synth.triggerRelease(); // Stop the note
+                synth.triggerRelease();
                 currentNote = null;
             }
         }
 
-        // Function to initialize Tone.js audio context
         function initializeAudioContext() {
             Tone.start().then(() => {
-                document.body.removeEventListener('touchstart', initializeAudioContext); // Remove listener once audio context is initialized
-                document.body.removeEventListener('mousedown', initializeAudioContext); // Remove listener once audio context is initialized
+                document.body.removeEventListener('touchstart', initializeAudioContext);
+                document.body.removeEventListener('mousedown', initializeAudioContext);
             });
         }
 
-        // Add listeners to initialize Tone.js context
         document.body.addEventListener('touchstart', initializeAudioContext);
         document.body.addEventListener('mousedown', initializeAudioContext);
 
-        // Create fretboard
         function renderFretboard() {
             const fretboard = document.getElementById('fretboard');
-            fretboard.innerHTML = ''; // Clear existing fretboard
+            const displayOption = document.getElementById('displayOption').value;
+            fretboard.innerHTML = '';
 
             const stringOrder = document.getElementById('stringOrder').value === 'reverse' ? tuningStandard.slice().reverse() : tuningStandard;
 
@@ -214,10 +231,9 @@
                 for (let fret = 0; fret <= frets; fret++) {
                     const fretDiv = document.createElement('div');
                     fretDiv.classList.add('fret');
-                    fretDiv.style.width = getFretWidth(fret); // Set width based on fret number
-                    fretDiv.style.height = `${fretDimensions.height}px`; // Set height based on input value
+                    fretDiv.style.width = getFretWidth(fret);
+                    fretDiv.style.height = `${fretDimensions.height}px`;
 
-                    // Apply different colors based on fret numbers
                     if (fret === 0) {
                         fretDiv.classList.add('fret-0');
                     } else if (highlightFrets.includes(fret)) {
@@ -226,31 +242,45 @@
                         fretDiv.classList.add('fret-12');
                     }
 
-                    // Calculate the note at this string and fret
-                    const midiNote = Tone.Frequency(stringNote).transpose(fret).toNote(); // Get the correct note using Tone.js
-                    const flatNote = getFlatEquivalent(midiNote); // Get the flat equivalent
+                    const midiNote = Tone.Frequency(stringNote).transpose(fret).toNote();
+                    const flatNote = getFlatEquivalent(midiNote);
 
-                    // Create a span for the fret number and hide it by default
-                    const numberSpan = document.createElement('span');
-                    numberSpan.classList.add('number');
-                    numberSpan.innerText = fret; // Show fret number
-                    fretDiv.appendChild(numberSpan);
-
-                    // Add mouse and touch events to start and stop the note
+                    if (displayOption === 'dots') {
+                        const dotSpan = document.createElement('span');
+                        dotSpan.classList.add('dot', 'show-dots');
+                        dotSpan.innerText = '•'; // Dot character
+                        fretDiv.appendChild(dotSpan);
+                    } else if (displayOption === 'numbers') {
+                        const numberSpan = document.createElement('span');
+                        numberSpan.classList.add('number', 'show-numbers');
+                        numberSpan.innerText = fret;
+                        fretDiv.appendChild(numberSpan);
+                    } else if (displayOption === 'notes1') {
+                        const noteSpan = document.createElement('span');
+                        noteSpan.classList.add('note', 'show-notes');
+                        noteSpan.innerText = flatNote;
+                        fretDiv.appendChild(noteSpan);
+        
+                    } else if (displayOption === 'notes2') {
+                        const noteSpan = document.createElement('span');
+                        noteSpan.classList.add('note', 'show-notes');
+                        noteSpan.innerText = midiNote;
+                        fretDiv.appendChild(noteSpan);
+                    }
                     fretDiv.addEventListener('mousedown', () => {
-                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
-                        startNote(midiNote); // Start playing the correct note
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
+                        startNote(midiNote);
                     });
 
-                    fretDiv.addEventListener('mouseup', stopNote); // Stop playing the note
-                    fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
+                    fretDiv.addEventListener('mouseup', stopNote);
+                    fretDiv.addEventListener('mouseleave', stopNote);
                     fretDiv.addEventListener('touchstart', () => {
-                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
-                        startNote(midiNote); // Start playing the correct note
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
+                        startNote(midiNote);
                     }, { passive: true });
 
-                    fretDiv.addEventListener('touchend', stopNote); // Stop playing the note
-                    fretDiv.addEventListener('touchcancel', stopNote); // Stop playing if touch is canceled
+                    fretDiv.addEventListener('touchend', stopNote);
+                    fretDiv.addEventListener('touchcancel', stopNote);
 
                     stringDiv.appendChild(fretDiv);
                 }
@@ -259,16 +289,15 @@
             });
         }
 
-        // Initialize fretboard
         renderFretboard();
 
-        // Update fretboard when input values change
         document.getElementById('fret0').addEventListener('input', updateFretDimensions);
         document.getElementById('fret1').addEventListener('input', updateFretDimensions);
         document.getElementById('fretHeight').addEventListener('input', updateFretDimensions);
         document.getElementById('stringOrder').addEventListener('change', renderFretboard);
-
+        document.getElementById('displayOption').addEventListener('change', renderFretboard);
     </script>
+
 <a target=_new href=https://www.musicca.com/metronome>https://www.musicca.com/metronome</a>
 </body>
 </html>
