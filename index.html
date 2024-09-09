@@ -268,14 +268,14 @@
                         fretDiv.appendChild(noteSpan);
                     }
                     fretDiv.addEventListener('mousedown', () => {
-                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`;
                         startNote(midiNote);
                     });
 
                     fretDiv.addEventListener('mouseup', stopNote);
                     fretDiv.addEventListener('mouseleave', stopNote);
                     fretDiv.addEventListener('touchstart', () => {
-                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`;
                         startNote(midiNote);
                     }, { passive: true });
 
