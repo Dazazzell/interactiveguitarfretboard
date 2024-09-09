@@ -91,10 +91,6 @@
             width: 60px;
             margin-right: 10px;
         }
-
-        .option {
-            margin: 10px;
-        }
     </style>
 </head>
 <body>
@@ -107,16 +103,8 @@
         <!-- Add additional inputs for other frets as needed -->
     </div>
 
-    <div class="option">
-        <label for="playMode">Play Mode:</label>
-        <select id="playMode">
-            <option value="click">Click to play</option>
-            <option value="clickHold" selected>Click and hold to play</option>
-        </select>
-    </div>
-
     <div class="fretboard" id="fretboard"></div>
-    <div class="note-display" id="noteDisplay">Click or click and hold a fret to play the note!</div>
+    <div class="note-display" id="noteDisplay">Click and hold a fret to play the note!</div>
 
     <script>
         const tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']; // Standard guitar tuning in MIDI octave notation
@@ -169,18 +157,6 @@
             }
         }
 
-        // Function to initialize Tone.js audio context
-        function initializeAudioContext() {
-            Tone.start().then(() => {
-                document.body.removeEventListener('touchstart', initializeAudioContext); // Remove listener once audio context is initialized
-                document.body.removeEventListener('mousedown', initializeAudioContext); // Remove listener once audio context is initialized
-            });
-        }
-
-        // Add listeners to initialize Tone.js context
-        document.body.addEventListener('touchstart', initializeAudioContext);
-        document.body.addEventListener('mousedown', initializeAudioContext);
-
         // Create fretboard
         function renderFretboard() {
             const fretboard = document.getElementById('fretboard');
@@ -213,46 +189,14 @@
                     numberSpan.innerText = fret; // Show fret number
                     fretDiv.appendChild(numberSpan);
 
-                    // Event listener function to handle note play
-                    function playNote() {
+                    // Add mouse events to start and stop the note
+                    fretDiv.addEventListener('mousedown', () => {
                         noteDisplay.innerText = `String: ${tuning.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
                         startNote(midiNote); // Start playing the correct note
-                    }
-
-                    // Get selected play mode
-                    const playMode = document.getElementById('playMode').value;
-
-                    // Add mouse and touch events to start and stop the note based on play mode
-                    fretDiv.addEventListener('mousedown', () => {
-                        if (playMode === 'click') {
-                            playNote(); // Play note on click if "Click to play" mode is selected
-                        }
                     });
 
                     fretDiv.addEventListener('mouseup', stopNote); // Stop playing the note
                     fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
-
-                    fretDiv.addEventListener('touchstart', (event) => {
-                        if (playMode === 'click') {
-                            playNote(); // Play note on touch if "Click to play" mode is selected
-                        }
-                        event.preventDefault(); // Prevent default touch behavior
-                    }, { passive: true });
-
-                    fretDiv.addEventListener('touchend', stopNote); // Stop playing the note
-                    fretDiv.addEventListener('touchcancel', stopNote); // Stop playing if touch is canceled
-
-                    if (playMode === 'clickHold') {
-                        fretDiv.addEventListener('mousedown', playNote); // Start playing on mouse down if "Click and hold to play" mode is selected
-                        fretDiv.addEventListener('mouseup', stopNote); // Stop playing on mouse up
-                        fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
-                        fretDiv.addEventListener('touchstart', (event) => {
-                            playNote(); // Start playing on touch start
-                            event.preventDefault(); // Prevent default touch behavior
-                        }, { passive: true });
-                        fretDiv.addEventListener('touchend', stopNote); // Stop playing on touch end
-                        fretDiv.addEventListener('touchcancel', stopNote); // Stop playing if touch is canceled
-                    }
 
                     stringDiv.appendChild(fretDiv);
                 }
@@ -267,9 +211,8 @@
         // Update fretboard when input values change
         document.getElementById('fret0').addEventListener('input', updateFretWidths);
         document.getElementById('fret1').addEventListener('input', updateFretWidths);
+        // Add event listeners for additional frets if needed
 
-        // Update fretboard when play mode changes
-        document.getElementById('playMode').addEventListener('change', renderFretboard);
     </script>
 
 </body>
