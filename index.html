@@ -81,7 +81,7 @@
 
         /* Style for the input fields */
         .inputs {
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
 
         .inputs label {
@@ -89,7 +89,7 @@
             margin: 5px 0;
         }
 
-        .inputs input {
+        .inputs input, .inputs select {
             width: 60px;
             margin-right: 10px;
         }
@@ -102,16 +102,20 @@
     <div class="fretboard" id="fretboard"></div>
     <div class="note-display" id="noteDisplay">Click and hold a fret to play the note!</div>
 
-    <!-- Moved the inputs section to the end -->
     <div class="inputs" id="inputs">
         <label for="fret0">Fret 0 Width (px): <input type="number" id="fret0" value="30"></label>
         <label for="fret1">Fret 1 Width (px): <input type="number" id="fret1" value="100"></label>
         <label for="fretHeight">Fret Height (px): <input type="number" id="fretHeight" value="40"></label>
-        <!-- Add additional inputs for other frets as needed -->
+        <label for="stringOrder">String Order:
+            <select id="stringOrder">
+                <option value="reverse" selected>Reverse (E4 to E2)</option>
+                <option value="standard">Standard (E2 to E4)</option>
+            </select>
+        </label>
     </div>
 
     <script>
-        const tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']; // Standard guitar tuning in MIDI octave notation
+        const tuningStandard = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']; // Standard guitar tuning in MIDI octave notation
         const frets = 21; // Number of frets
         const highlightFrets = [0, 3, 5, 7, 9, 15, 17, 19, 21]; // Frets with special color
         const specialFret12 = 12; // Fret 12 with unique color
@@ -182,7 +186,9 @@
             const fretboard = document.getElementById('fretboard');
             fretboard.innerHTML = ''; // Clear existing fretboard
 
-            tuning.slice().reverse().forEach((stringNote, stringIndex) => {
+            const stringOrder = document.getElementById('stringOrder').value === 'reverse' ? tuningStandard.slice().reverse() : tuningStandard;
+
+            stringOrder.forEach((stringNote, stringIndex) => {
                 const stringDiv = document.createElement('div');
                 stringDiv.classList.add('string');
 
@@ -212,16 +218,15 @@
 
                     // Add mouse and touch events to start and stop the note
                     fretDiv.addEventListener('mousedown', () => {
-                        noteDisplay.innerText = `String: ${tuning.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
+                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
                         startNote(midiNote); // Start playing the correct note
                     });
 
                     fretDiv.addEventListener('mouseup', stopNote); // Stop playing the note
                     fretDiv.addEventListener('mouseleave', stopNote); // Stop playing if mouse leaves the fret
-                    fretDiv.addEventListener('touchstart', (event) => {
-                        noteDisplay.innerText = `String: ${tuning.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
+                    fretDiv.addEventListener('touchstart', () => {
+                        noteDisplay.innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote}`;
                         startNote(midiNote); // Start playing the correct note
-                        event.preventDefault(); // Prevent default touch behavior to avoid text selection
                     }, { passive: true });
 
                     fretDiv.addEventListener('touchend', stopNote); // Stop playing the note
@@ -241,7 +246,7 @@
         document.getElementById('fret0').addEventListener('input', updateFretDimensions);
         document.getElementById('fret1').addEventListener('input', updateFretDimensions);
         document.getElementById('fretHeight').addEventListener('input', updateFretDimensions);
-        // Add event listeners for additional frets if needed
+        document.getElementById('stringOrder').addEventListener('change', renderFretboard);
 
     </script>
 
