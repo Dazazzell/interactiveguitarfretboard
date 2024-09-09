@@ -49,25 +49,24 @@
             color: #fff; /* White color for dot text in dark background */
         }
 
-        /* Hide fret numbers initially and display them on hover */
+        /* Hide fret numbers and display dots */
         .fret .number {
-            visibility: hidden;
+            visibility: hidden; /* Hide fret number by default */
         }
 
-        .fret:hover .number {
-            visibility: visible;
-        }
-
-        /* Dot for default state */
         .fret::before {
-            content: '•';
+            content: '•'; /* Dot for default state */
             position: absolute;
             font-size: 20px;
             color: #555;
         }
 
+        .fret:hover .number {
+            visibility: hidden; /* Hide fret number on hover */
+        }
+
         .fret:hover::before {
-            content: '';
+            content: '•'; /* Display dot on hover */
         }
 
         .fret:hover {
