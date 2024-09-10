@@ -159,6 +159,7 @@
             <select id="displayOption">
                 <option value="numbers" selected>Fret Numbers</option>
                 <option value="dots">Dots</option>
+                <option value="intervals">Intervals</option>
                 <option value="notes1">Note Names Flat</option>
                 <option value="notes2">Note Names Sharp</option>
             </select>
@@ -356,6 +357,11 @@ function semitonesToInterval(semitones) {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
                         noteSpan.innerText = midiNote;
+                        fretDiv.appendChild(noteSpan);
+                    } else if (displayOption === 'intervals') {
+                        const noteSpan = document.createElement('span');
+                        noteSpan.classList.add('note', 'show-notes');
+                        noteSpan.innerText = semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi());
                         fretDiv.appendChild(noteSpan);
                     }
 
