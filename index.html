@@ -272,6 +272,7 @@ function semitonesToInterval(semitones) {
         function stopNote() {
             if (currentNote) {
                 synth.triggerRelease();
+                document.getElementById('noteDisplay').innerText = `-`;
                 currentNote = null;
             }
         }
