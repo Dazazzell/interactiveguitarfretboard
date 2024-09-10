@@ -220,6 +220,11 @@
             return noteToFlat[note] || note;
         }
 
+         function updateRootNote() {
+            rootNote = document.getElementById('rootNote').value;
+            renderFretboard();
+        }
+
 function semitonesToInterval(semitones) {
     // Define the names of intervals for 0 to 12 semitones
     const intervalNames = [
