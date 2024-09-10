@@ -145,6 +145,16 @@
                 <option value="B4">B</option>
             </select>
         </label>
+        <label>
+            Show on Hover:
+            <select id="displayOption" style=width:130px;">
+                <option value="numbers" selected>Fret Numbers</option>
+                <option value="intervals">Intervals</option>
+                <option value="notes1">Note Names Flat</option>
+                <option value="notes2">Note Names Sharp</option>
+                <option value="dots">Dots</option>
+            </select>
+        </label>
         <label for="noteDuration">Note Duration (ms): <input type="number" id="noteDuration" value="250"></label>
         <label for="fret0">Fret 0 Width (px): <input type="number" id="fret0" value="20"></label>
         <label for="fret1">Fret 1 Width (px): <input type="number" id="fret1" value="50"></label>
@@ -153,16 +163,6 @@
             <select id="stringOrder">
                 <option value="reverse" selected>Reverse (E4 to E2)</option>
                 <option value="standard">Standard (E2 to E4)</option>
-            </select>
-        </label>
-        <label>
-            Show on Hover:
-            <select id="displayOption">
-                <option value="numbers" selected>Fret Numbers</option>
-                <option value="intervals">Intervals</option>
-                <option value="notes1">Note Names Flat</option>
-                <option value="notes2">Note Names Sharp</option>
-                <option value="dots">Dots</option>
             </select>
         </label>
         <label>
