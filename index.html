@@ -620,6 +620,7 @@
   
 
                     fretDiv.addEventListener('touchend', () => { 
+                        event.preventDefault();
 
                         stopNote(); 
 
@@ -628,6 +629,7 @@
                     }); 
 
                     fretDiv.addEventListener('touchcancel', () => { 
+                        event.preventDefault();
 
                         stopNote(); 
 
