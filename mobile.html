@@ -276,7 +276,7 @@ let lastNote = null;
 let noteTimeout = null;
 
 function startNote(note) {
-    if (!currentNote) {
+    if (currentNote !== null) {
        // synth.triggerRelease();
    // }
     currentNote = note;
