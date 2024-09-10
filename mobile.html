@@ -374,6 +374,7 @@ function stopNote() {
                     } else if (displayOption === 'intervals') {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
+                        noteSpan.style.color = 'blue';
                         noteSpan.innerText = semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi());
                         fretDiv.appendChild(noteSpan);
                     }
