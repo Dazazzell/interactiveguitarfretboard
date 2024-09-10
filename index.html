@@ -1,198 +1,693 @@
 <!DOCTYPE html> 
+
 <html lang="en"> 
+
 <head> 
+
     <meta charset="UTF-8"> 
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+
     <title>Interactive Guitar Fretboard</title> 
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.js"></script> 
+
     <style> 
+
         body { 
+
             font-family: Arial, sans-serif; 
+
             text-align: center; 
+
             margin: 20px; 
+
             user-select: none; 
+
         } 
+
+  
+
         .fretboard { 
+
             display: flex; 
+
             flex-direction: column; 
+
             align-items: center; 
+
             margin-top: 20px; 
+
         } 
+
+  
+
         .string { 
+
             display: flex; 
+
         } 
+
+  
+
         .fret { 
+
             border-right: 1px solid #000; 
+
             display: flex; 
+
             align-items: center; 
+
             justify-content: center; 
+
             cursor: pointer; 
+
             background-color: #f0f0f0; 
+
             position: relative; 
+
             user-select: none; 
+
             height: var(--fret-height, 40px); 
+
         } 
+
+  
+
         .fret.hide-right-border { 
+
             border-right: none; 
+
         } 
+
+         
+
         .fret::before { 
+
             content: ''; 
+
             position: absolute; 
+
             width: 98%; 
+
             height: 1px; 
+
             border-top: 1px dashed #000; 
+
             top: 50%; 
+
             transform: translateY(-50%); 
+
         } 
+
+  
+
         .fret.highlight { 
+
             background-color: #FFD700; 
+
         } 
+
+  
+
         .fret.fret-12 { 
+
             background-color: #FF6347; 
+
         } 
+
+  
+
         .fret.fret-0 { 
+
             background-color: #333; 
+
             color: #fff; 
+
         } 
+
+  
+
         .fret .dot, .fret .number, .fret .note { 
+
             visibility: hidden; 
+
         } 
+
+  
+
         .fret:hover .dot.show-dots { 
+
             visibility: visible; 
+
         } 
+
+  
+
         .fret:hover .number.show-numbers { 
+
             visibility: visible; 
+
         } 
+
+  
+
         .fret:hover .note.show-notes { 
+
             visibility: visible; 
+
         } 
+
+  
+
         .fret:hover { 
+
             background-color: #ddd; 
+
         } 
+
+  
+
         .fret .dot { 
+
             position: absolute; 
+
             font-size: 20px; 
+
             color: #555; 
+
         } 
+
+  
+
         .fret .number { 
+
             font-size: 16px; 
+
             color: #000; 
+
         } 
+
+  
+
         .fret .note { 
+
             font-size: 16px; 
+
             color: #000; 
+
         } 
+
+  
+
         .note-display { 
+
             margin-top: 20px; 
+
             font-size: 20px; 
+
         } 
+
+  
+
         .inputs { 
+
             margin-top: 20px; 
+
         } 
+
+  
+
         .inputs label { 
+
             display: block; 
+
             margin: 5px 0; 
+
         } 
+
+  
+
         .inputs input, .inputs select { 
+
             width: 60px; 
+
             margin-right: 10px; 
+
         } 
+
+  
+
         .inputs input[type="checkbox"] { 
+
             width: auto; 
+
             margin-right: 5px; 
+
         } 
+
     </style> 
+
 </head> 
+
 <body> 
+
+  
+
     <h1>Interactive Guitar Fretboard</h1> 
+
+  
+
     <div class="fretboard" id="fretboard"></div> 
+
     <div class="note-display" id="noteDisplay">Click and hold a fret to play the note!</div> 
+
+  
+
     <div class="inputs" id="inputs"> 
+
         <label for="fret0">Fret 0 Width (px): <input type="number" id="fret0" value="30"></label> 
+
         <label for="fret1">Fret 1 Width (px): <input type="number" id="fret1" value="100"></label> 
+
         <label for="fretHeight">Fret Height (px): <input type="number" id="fretHeight" value="40"></label> 
+
         <label for="stringOrder">String Order: 
+
             <select id="stringOrder"> 
+
                 <option value="reverse" selected>Reverse (E4 to E2)</option> 
+
                 <option value="standard">Standard (E2 to E4)</option> 
+
             </select> 
+
         </label> 
+
         <label> 
+
             Show: 
+
             <select id="displayOption"> 
+
                 <option value="numbers" selected>Fret Numbers</option> 
+
                 <option value="dots">Dots</option> 
+
                 <option value="notes1">Note Names Flat</option> 
+
                 <option value="notes2">Note Names Sharp</option> 
+
             </select> 
+
         </label> 
+
         <label> 
+
             Hide Frets: 
+
             <input type="checkbox" id="hideRightBorder" checked> 
+
         </label> 
+
     </div> 
 
+  
+
     <script> 
+
         const tuningStandard = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']; 
+
         const frets = 21; 
+
         const highlightFrets = [0, 3, 5, 7, 9, 15, 17, 19, 21]; 
+
         const specialFret12 = 12; 
+
+  
+
         const fretDimensions = { 
+
             width: { 
+
                 0: parseInt(document.getElementById('fret0').value) || 30, 
+
                 1: parseInt(document.getElementById('fret1').value) || 100, 
+
             }, 
+
             height: parseInt(document.getElementById('fretHeight').value) || 40, 
+
         }; 
+
+  
+
         function getFretWidth(fret) { 
+
             if (fret === 0) { 
+
                 return `${fretDimensions.width[0]}px`; 
+
             } 
+
             if (fret === 1) { 
+
                 return `${fretDimensions.width[1]}px`; 
+
             } 
+
             return `${fretDimensions.width[1] * Math.pow(1 / 1.06, fret - 1)}px`; 
+
         } 
+
+  
+
         function getFlatEquivalent(note) { 
+
             const noteToFlat = { 
+
                 'C#1': 'Db1', 'D#1': 'Eb1', 'F#1': 'Gb1', 'G#1': 'Ab1', 'A#1': 'Bb1', 
+
                 'Db1': 'C#1', 'Eb1': 'D#1', 'Gb1': 'F#1', 'Ab1': 'G#1', 'Bb1': 'A#1', 
+
                 'C#2': 'Db2', 'D#2': 'Eb2', 'F#2': 'Gb2', 'G#2': 'Ab2', 'A#2': 'Bb2', 
+
                 'Db2': 'C#2', 'Eb2': 'D#2', 'Gb2': 'F#2', 'Ab2': 'G#2', 'Bb2': 'A#2', 
+
                 'C#3': 'Db3', 'D#3': 'Eb3', 'F#3': 'Gb3', 'G#3': 'Ab3', 'A#3': 'Bb3', 
+
                 'Db3': 'C#3', 'Eb3': 'D#3', 'Gb3': 'F#3', 'Ab3': 'G#3', 'Bb3': 'A#3', 
+
                 'C#4': 'Db4', 'D#4': 'Eb4', 'F#4': 'Gb4', 'G#4': 'Ab4', 'A#4': 'Bb4', 
+
                 'Db4': 'C#4', 'Eb4': 'D#4', 'Gb4': 'F#4', 'Ab4': 'G#4', 'Bb4': 'A#4', 
+
                 'C#5': 'Db5', 'D#5': 'Eb5', 'F#5': 'Gb5', 'G#5': 'Ab5', 'A#5': 'Bb5', 
+
                 'Db5': 'C#5', 'Eb5': 'D#5', 'Gb5': 'F#5', 'Ab5': 'G#5', 'Bb5': 'A#5', 
+
                 'C#6': 'Db6', 'D#6': 'Eb6', 'F#6': 'Gb6', 'G#6': 'Ab6', 'A#6': 'Bb6', 
+
                 'Db6': 'C#6', 'Eb6': 'D#6', 'Gb6': 'F#6', 'Ab6': 'G#6', 'Bb6': 'A#6' 
+
             }; 
+
             return noteToFlat[note] || note; 
+
         } 
-        document.body.addEventListener('touchstart', async () => { 
-            await Tone.start(); 
-            console.log('Tone.js is ready'); 
-        }, { once: true }); 
+
+  
+
+        function updateFretDimensions() { 
+
+            fretDimensions.width[0] = parseInt(document.getElementById('fret0').value) || 30; 
+
+            fretDimensions.width[1] = parseInt(document.getElementById('fret1').value) || 100; 
+
+            fretDimensions.height = parseInt(document.getElementById('fretHeight').value) || 40; 
+
+            renderFretboard(); 
+
+        } 
+
+  
 
         const synth = new Tone.Synth().toDestination(); 
+
         let currentNote = null; 
+
+        let lastNote = null; 
+
+  
+
         function startNote(note) { 
+
             if (currentNote) { 
+
                 synth.triggerRelease(); 
+
             } 
+
             currentNote = note; 
+
             synth.triggerAttack(note); 
-        } 
-        function stopNote() { 
-            if (currentNote) { 
-                synth.triggerRelease(); 
-                currentNote = null; 
-            } 
+
         } 
 
-        // More code for building the fretboard, handling inputs, etc.
+  
+
+        function stopNote() { 
+
+            if (currentNote) { 
+
+                synth.triggerRelease(); 
+
+                currentNote = null; 
+
+            } 
+
+        } 
+
+  
+
+        function handleMouseMove(event, fretDiv, midiNote) { 
+
+            if (event.buttons > 0) { // Check if mouse button is pressed 
+
+                if (midiNote !== lastNote) { 
+
+                    document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note}`; 
+
+                    startNote(midiNote); 
+
+                    lastNote = midiNote; 
+
+                } 
+
+            } 
+
+        } 
+
+  
+
+        function renderFretboard() { 
+
+            const fretboard = document.getElementById('fretboard'); 
+
+            const displayOption = document.getElementById('displayOption').value; 
+
+            fretboard.innerHTML = ''; 
+
+  
+
+            const stringOrder = document.getElementById('stringOrder').value === 'reverse' ? tuningStandard.slice().reverse() : tuningStandard; 
+
+  
+
+            stringOrder.forEach((stringNote, stringIndex) => { 
+
+                const stringDiv = document.createElement('div'); 
+
+                stringDiv.classList.add('string'); 
+
+  
+
+                for (let fret = 0; fret <= frets; fret++) { 
+
+                    const fretDiv = document.createElement('div'); 
+
+                    fretDiv.classList.add('fret'); 
+
+                    fretDiv.style.width = getFretWidth(fret); 
+
+                    fretDiv.style.height = `${fretDimensions.height}px`; 
+
+                    fretDiv.dataset.string = tuningStandard.length - stringIndex; 
+
+                    fretDiv.dataset.fret = fret; 
+
+  
+
+                    if (fret === 0) { 
+
+                        fretDiv.classList.add('fret-0'); 
+
+                    } else if (highlightFrets.includes(fret)) { 
+
+                        fretDiv.classList.add('highlight'); 
+
+                    } else if (fret === specialFret12) { 
+
+                        fretDiv.classList.add('fret-12'); 
+
+                    } 
+
+  
+
+                    const midiNote = Tone.Frequency(stringNote).transpose(fret).toNote(); 
+
+                    const flatNote = getFlatEquivalent(midiNote); 
+
+                    fretDiv.dataset.note = flatNote; 
+
+  
+
+                    if (displayOption === 'dots') { 
+
+                        const dotSpan = document.createElement('span'); 
+
+                        dotSpan.classList.add('dot', 'show-dots'); 
+
+                        dotSpan.innerText = '•'; // Dot character 
+
+                        fretDiv.appendChild(dotSpan); 
+
+                    } else if (displayOption === 'numbers') { 
+
+                        const numberSpan = document.createElement('span'); 
+
+                        numberSpan.classList.add('number', 'show-numbers'); 
+
+                        numberSpan.innerText = fret; 
+
+                        fretDiv.appendChild(numberSpan); 
+
+                    } else if (displayOption === 'notes1') { 
+
+                        const noteSpan = document.createElement('span'); 
+
+                        noteSpan.classList.add('note', 'show-notes'); 
+
+                        noteSpan.innerText = flatNote; 
+
+                        fretDiv.appendChild(noteSpan); 
+
+                    } else if (displayOption === 'notes2') { 
+
+                        const noteSpan = document.createElement('span'); 
+
+                        noteSpan.classList.add('note', 'show-notes'); 
+
+                        noteSpan.innerText = midiNote; 
+
+                        fretDiv.appendChild(noteSpan); 
+
+                    } 
+
+  
+
+                    fretDiv.addEventListener('mousedown', () => { 
+
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`; 
+
+                        startNote(midiNote); 
+
+                        lastNote = midiNote; 
+
+                    }); 
+
+  
+
+                    fretDiv.addEventListener('mousemove', (event) => handleMouseMove(event, fretDiv, midiNote)); 
+
+                    fretDiv.addEventListener('mouseup', () => { 
+
+                        stopNote(); 
+
+                        lastNote = null; // Reset lastNote on mouse up 
+
+                    }); 
+
+                    fretDiv.addEventListener('mouseleave', () => { 
+
+                        stopNote(); 
+
+                        lastNote = null; // Reset lastNote on mouse leave 
+
+                    }); 
+
+                    fretDiv.addEventListener('touchstart', () => { 
+
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`; 
+
+                        startNote(midiNote); 
+
+                        lastNote = midiNote; 
+
+                    }, { passive: true }); 
+
+  
+
+                    fretDiv.addEventListener('touchend', () => { 
+
+                        stopNote(); 
+
+                        lastNote = null; // Reset lastNote on touch end 
+
+                    }); 
+
+                    fretDiv.addEventListener('touchcancel', () => { 
+
+                        stopNote(); 
+
+                        lastNote = null; // Reset lastNote on touch cancel 
+
+                    }); 
+
+  
+
+                    stringDiv.appendChild(fretDiv); 
+
+                } 
+
+  
+
+                fretboard.appendChild(stringDiv); 
+
+            }); 
+
+  
+
+            // Apply the right border hiding based on the checkbox state 
+
+            const hideBorderCheckbox = document.getElementById('hideRightBorder'); 
+
+            const fretDivs = document.querySelectorAll('.fret'); 
+
+            if (hideBorderCheckbox.checked) { 
+
+                fretDivs.forEach(fret => fret.classList.add('hide-right-border')); 
+
+            } else { 
+
+                fretDivs.forEach(fret => fret.classList.remove('hide-right-border')); 
+
+            } 
+
+        } 
+
+  
+
+        renderFretboard(); 
+
+  
+
+        document.getElementById('fret0').addEventListener('input', updateFretDimensions); 
+
+        document.getElementById('fret1').addEventListener('input', updateFretDimensions); 
+
+        document.getElementById('fretHeight').addEventListener('input', updateFretDimensions); 
+
+        document.getElementById('stringOrder').addEventListener('change', renderFretboard); 
+
+        document.getElementById('displayOption').addEventListener('change', renderFretboard); 
+
+        document.getElementById('hideRightBorder').addEventListener('change', renderFretboard); 
 
     </script> 
+
 </body> 
-</html>
+
+</html> 
+
+ 
