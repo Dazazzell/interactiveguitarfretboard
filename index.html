@@ -221,13 +221,20 @@
         } 
 
         function handleMouseMove(event, fretDiv, midiNote) { 
-            if (event.buttons > 0) { // Check if mouse button is pressed 
+            if (event.buttons > 0) { 
                 if (midiNote !== lastNote) { 
                     document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note}`; 
                     startNote(midiNote); 
                     lastNote = midiNote; 
                 } 
             } 
+        } 
+
+        function handleTouchStart(event, fretDiv, midiNote) { 
+            event.preventDefault(); 
+            document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note}`; 
+            startNote(midiNote); 
+            lastNote = midiNote; 
         } 
 
         function renderFretboard() { 
@@ -264,7 +271,7 @@
                     if (displayOption === 'dots') { 
                         const dotSpan = document.createElement('span'); 
                         dotSpan.classList.add('dot', 'show-dots'); 
-                        dotSpan.innerText = '•'; // Dot character 
+                        dotSpan.innerText = '•'; 
                         fretDiv.appendChild(dotSpan); 
                     } else if (displayOption === 'numbers') { 
                         const numberSpan = document.createElement('span'); 
@@ -292,29 +299,24 @@
                     fretDiv.addEventListener('mousemove', (event) => handleMouseMove(event, fretDiv, midiNote)); 
                     fretDiv.addEventListener('mouseup', () => { 
                         stopNote(); 
-                        lastNote = null; // Reset lastNote on mouse up 
+                        lastNote = null; 
                     }); 
 
                     fretDiv.addEventListener('mouseleave', () => { 
                         stopNote(); 
-                        lastNote = null; // Reset lastNote on mouse leave 
+                        lastNote = null; 
                     }); 
 
-                    fretDiv.addEventListener('touchstart', (event) => { 
-                        event.preventDefault(); // Prevent default touch behavior 
-                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`; 
-                        startNote(midiNote); 
-                        lastNote = midiNote; 
-                    }, { passive: true }); 
+                    fretDiv.addEventListener('touchstart', (event) => handleTouchStart(event, fretDiv, midiNote), { passive: true }); 
 
                     fretDiv.addEventListener('touchend', () => { 
                         stopNote(); 
-                        lastNote = null; // Reset lastNote on touch end 
+                        lastNote = null; 
                     }); 
 
                     fretDiv.addEventListener('touchcancel', () => { 
                         stopNote(); 
-                        lastNote = null; // Reset lastNote on touch cancel 
+                        lastNote = null; 
                     }); 
 
                     stringDiv.appendChild(fretDiv); 
@@ -323,7 +325,6 @@
                 fretboard.appendChild(stringDiv); 
             }); 
 
-            // Apply the right border hiding based on the checkbox state 
             const hideBorderCheckbox = document.getElementById('hideRightBorder'); 
             const fretDivs = document.querySelectorAll('.fret'); 
             if (hideBorderCheckbox.checked) { 
@@ -333,14 +334,23 @@
             } 
         } 
 
-        renderFretboard(); 
+        document.addEventListener('DOMContentLoaded', () => { 
+            // Ensure the audio context is started by a user gesture 
+            document.body.addEventListener('click', () => { 
+                Tone.start().then(() => { 
+                    console.log('Audio context started'); 
+                }); 
+            }, { once: true }); 
+            
+            renderFretboard(); 
 
-        document.getElementById('fret0').addEventListener('input', updateFretDimensions); 
-        document.getElementById('fret1').addEventListener('input', updateFretDimensions); 
-        document.getElementById('fretHeight').addEventListener('input', updateFretDimensions); 
-        document.getElementById('stringOrder').addEventListener('change', renderFretboard); 
-        document.getElementById('displayOption').addEventListener('change', renderFretboard); 
-        document.getElementById('hideRightBorder').addEventListener('change', renderFretboard); 
+            document.getElementById('fret0').addEventListener('input', updateFretDimensions); 
+            document.getElementById('fret1').addEventListener('input', updateFretDimensions); 
+            document.getElementById('fretHeight').addEventListener('input', updateFretDimensions); 
+            document.getElementById('stringOrder').addEventListener('change', renderFretboard); 
+            document.getElementById('displayOption').addEventListener('change', renderFretboard); 
+            document.getElementById('hideRightBorder').addEventListener('change', renderFretboard); 
+        }); 
     </script> 
 </body> 
 </html>
