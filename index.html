@@ -607,6 +607,7 @@
                     }); 
 
                     fretDiv.addEventListener('touchstart', () => { 
+                        event.preventDefault();  // Prevent scrolling on touch
 
                         document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`; 
 
