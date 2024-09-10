@@ -129,6 +129,22 @@
     <div class="fretboard" id="fretboard"></div>
     <div class="note-display" id="noteDisplay">Touch a fret to play the note!</div>
     <div class="inputs" id="inputs">
+      <label for="rootNote">Root Note:
+            <select id="rootNote">
+                <option value="C4 selected">C</option>
+                <option value="C#4" >C# / Db</option>
+                <option value="D4">D</option>
+                <option value="D#4">D# / Eb</option>
+                <option value="E4">E</option>
+                <option value="F4">F</option>
+                <option value="F#4">F# / Gb</option>
+                <option value="G4">G</option>
+                <option value="G#4">G# / Ab</option>
+                <option value="A4">A</option>
+                <option value="A#4">A# / Bb</option>
+                <option value="B4">B</option>
+            </select>
+        </label>
         <label for="noteDuration">Note Duration (ms): <input type="number" id="noteDuration" value="250"></label>
         <label for="fret0">Fret 0 Width (px): <input type="number" id="fret0" value="20"></label>
         <label for="fret1">Fret 1 Width (px): <input type="number" id="fret1" value="50"></label>
@@ -144,6 +160,7 @@
             <select id="displayOption">
                 <option value="numbers" selected>Fret Numbers</option>
                 <option value="dots">Dots</option>
+                <option value="intervals">Intervals</option>
                 <option value="notes1">Note Names Flat</option>
                 <option value="notes2">Note Names Sharp</option>
             </select>
@@ -203,6 +220,33 @@
             return noteToFlat[note] || note;
         }
 
+function semitonesToInterval(semitones) {
+    // Define the names of intervals for 0 to 12 semitones
+    const intervalNames = [
+        "R",    // 0
+        "b2", // 1
+        "2", // 2
+        "b3", // 3
+        "3", // 4
+        "4", // 5
+        "b5", // 6
+        "5", // 7
+        "b6", // 8
+        "6", // 9
+        "b7", // 10
+        "7", // 11
+        "R"    // 12
+    ];
+
+    // Normalize semitones to the range 0 to 12
+    let normalizedSemitones = ((semitones % 12) + 12) % 12;
+
+    // Compute the interval name
+    let intervalName = intervalNames[normalizedSemitones];
+
+    return intervalName;
+}
+
         function updateFretDimensions() {
             fretDimensions.width[0] = parseInt(document.getElementById('fret0').value) || 30;
             fretDimensions.width[1] = parseInt(document.getElementById('fret1').value) || 100;
@@ -221,7 +265,8 @@
         }
 
         const synth = new Tone.Synth().toDestination();
-       let currentNote = null;
+let rootNote = 'C4'
+let currentNote = null;
 let lastNote = null;
 let noteTimeout = null;
 
@@ -256,7 +301,7 @@ function stopNote() {
         function handleMouseMove(event, fretDiv, midiNote) {
             if (event.buttons > 0) {
                 if (midiNote !== lastNote) {
-                    document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note}`;
+                    document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note} | ${semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi())}`;
                     startNote(midiNote);
                     lastNote = midiNote;
                 }
@@ -265,7 +310,7 @@ function stopNote() {
 
         function handleTouchStart(event, fretDiv, midiNote) {
             event.preventDefault();
-            document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note}`;
+            document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note} | ${semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi())}`;
             startNote(midiNote);
             lastNote = midiNote;
         }
@@ -321,10 +366,15 @@ function stopNote() {
                         noteSpan.classList.add('note', 'show-notes');
                         noteSpan.innerText = midiNote;
                         fretDiv.appendChild(noteSpan);
+                    } else if (displayOption === 'intervals') {
+                        const noteSpan = document.createElement('span');
+                        noteSpan.classList.add('note', 'show-notes');
+                        noteSpan.innerText = semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi());
+                        fretDiv.appendChild(noteSpan);
                     }
 
                     fretDiv.addEventListener('mousedown', () => {
-                        document.getElementById('noteDisplay').innerText = `${midiNote} / ${flatNote}`;
+                        document.getElementById('noteDisplay').innerText = `${midiNote} / ${flatNote} | ${semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi())}`;
                         startNote(midiNote);
                         lastNote = midiNote;
                     });
@@ -375,6 +425,7 @@ function stopNote() {
             document.getElementById('displayOption').addEventListener('change', renderFretboard);
             document.getElementById('highlightFrets').addEventListener('change', updateHighlightFrets);
             document.getElementById('hideRightBorder').addEventListener('change', renderFretboard);
+            document.getElementById('rootNote').addEventListener('change', updateRootNote);
         });
     </script>
 <a href=index.html>Desktop</a>
