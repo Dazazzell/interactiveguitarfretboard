@@ -276,9 +276,9 @@ let lastNote = null;
 let noteTimeout = null;
 
 function startNote(note) {
-    if (currentNote) {
+    if (!currentNote) {
        // synth.triggerRelease();
-    }
+   // }
     currentNote = note;
     synth.triggerAttack(note);
     
@@ -292,6 +292,7 @@ function startNote(note) {
     noteTimeout = setTimeout(() => {
         stopNote();
     }, noteDuration);
+    }
 }
 
 
