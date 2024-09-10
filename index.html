@@ -606,33 +606,24 @@
 
                     }); 
 
-                    fretDiv.addEventListener('touchstart', () => { 
-
-                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`; 
-
-                        startNote(midiNote); 
-
-                        lastNote = midiNote; 
-
-                    }, { passive: true }); 
-
-  
-
-                    fretDiv.addEventListener('touchend', () => { 
-
-                        stopNote(); 
-
-                        lastNote = null; // Reset lastNote on touch end 
-
-                    }); 
-
-                    fretDiv.addEventListener('touchcancel', () => { 
-
-                        stopNote(); 
-
-                        lastNote = null; // Reset lastNote on touch cancel 
-
-                    }); 
+                    fretDiv.addEventListener('touchstart', (event) => {
+                        event.preventDefault();  // Prevent scrolling on touch
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`;
+                        startNote(midiNote);
+                        lastNote = midiNote;
+                    }, { passive: false });  // Set passive to false to allow preventDefault
+                    
+                    fretDiv.addEventListener('touchend', (event) => {
+                        event.preventDefault();
+                        stopNote();
+                        lastNote = null; // Reset lastNote on touch end
+                    }, { passive: false });
+                    
+                    fretDiv.addEventListener('touchcancel', (event) => {
+                        event.preventDefault();
+                        stopNote();
+                        lastNote = null; // Reset lastNote on touch cancel
+                    }, { passive: false });
 
   
 
