@@ -309,7 +309,7 @@
                     }
 
                     fretDiv.addEventListener('mousedown', () => {
-                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${flatNote} / ${midiNote}`;
+                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
                         startNote(midiNote);
                         lastNote = midiNote;
                     });
