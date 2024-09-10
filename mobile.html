@@ -256,7 +256,7 @@ function stopNote() {
         function handleMouseMove(event, fretDiv, midiNote) {
             if (event.buttons > 0) {
                 if (midiNote !== lastNote) {
-                    document.getElementById('noteDisplay').innerText = `${fretDiv.dataset.note} / ${midiNote}`;
+                    document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note}`;
                     startNote(midiNote);
                     lastNote = midiNote;
                 }
