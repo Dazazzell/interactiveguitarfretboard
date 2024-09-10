@@ -129,32 +129,8 @@
     <div class="fretboard" id="fretboard"></div>
     <div class="note-display" id="noteDisplay">Click and hold a fret to play the note!</div>
     <div class="inputs" id="inputs">
-        <label for="rootNote">Root Note:
-            <select id="rootNote">
-                <option value="C4 selected">C</option>
-                <option value="C#4" >C# / Db</option>
-                <option value="D4">D</option>
-                <option value="D#4">D# / Eb</option>
-                <option value="E4">E</option>
-                <option value="F4">F</option>
-                <option value="F#4">F# / Gb</option>
-                <option value="G4">G</option>
-                <option value="G#4">G# / Ab</option>
-                <option value="A4">A</option>
-                <option value="A#4">A# / Bb</option>
-                <option value="B4">B</option>
-            </select>
-        </label>
-        <label>
-            Show on Hover:
-            <select id="displayOption" style=width:130px;">
-                <option value="numbers" selected>Fret Numbers</option>
-                <option value="intervals">Intervals</option>
-                <option value="notes1">Note Names Flat</option>
-                <option value="notes2">Note Names Sharp</option>
-                <option value="dots">Dots</option>
-            </select>
-        </label>
+
+        
         <label for="fret0">Fret 0 Width (px): <input type="number" id="fret0" value="30"></label>
         <label for="fret1">Fret 1 Width (px): <input type="number" id="fret1" value="110"></label>
         <label for="fretHeight">Fret Height (px): <input type="number" id="fretHeight" value="40"></label>
@@ -174,6 +150,16 @@
         <label>
             Hide Frets:
             <input type="checkbox" id="hideRightBorder" checked>
+        </label>
+        <label>
+            Show on Hover:
+            <select id="displayOption" style=width:130px;">
+                <option value="numbers" selected>Fret Numbers</option>
+                <option value="intervals">Intervals</option>
+                <option value="notes1">Note Names Flat</option>
+                <option value="notes2">Note Names Sharp</option>
+                <option value="dots">Dots</option>
+            </select>
         </label>
 
     </div>
@@ -361,6 +347,7 @@ function semitonesToInterval(semitones) {
                     } else if (displayOption === 'intervals') {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
+                        noteSpan.style.color = 'blue';
                         noteSpan.innerText = semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi());
                         fretDiv.appendChild(noteSpan);
                     }
@@ -429,7 +416,91 @@ function semitonesToInterval(semitones) {
             document.getElementById('rootNote').addEventListener('change', updateRootNote);
         });
     </script>
-<a href=mobile.html>Mobile</a>
 
 </body>
+</html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Note</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: 20px auto;
+        }
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        td.selected {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <table id="noteTable">
+        <tr>
+            <td>C</td>
+            <td>Db</td>
+            <td>D</td>
+            <td>Eb</td>
+            <td>E</td>
+            <td>F</td>
+            <td>Gb</td>
+            <td>G</td>
+            <td>Ab</td>
+            <td>A</td>
+            <td>Bb</td>
+            <td>B</td>
+        </tr>
+        <tr>
+            <td>C</td>
+            <td>C#</td>
+            <td>D</td>
+            <td>D#</td>
+            <td>E</td>
+            <td>F</td>
+            <td>F#</td>
+            <td>G</td>
+            <td>G#</td>
+            <td>A</td>
+            <td>A#</td>
+            <td>B</td>
+        </tr>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const noteTable = document.getElementById('noteTable');
+            const selectedNoteDisplay = document.getElementById('selectedNote');
+
+            noteTable.addEventListener('click', (event) => {
+                if (event.target.tagName === 'TD') {
+                    // Remove selected class from any previously selected cell
+                    const previouslySelected = document.querySelector('td.selected');
+                    if (previouslySelected) {
+                        previouslySelected.classList.remove('selected');
+                    }
+
+                    // Add selected class to the clicked cell
+                    const clickedCell = event.target;
+                    clickedCell.classList.add('selected');
+
+                    // Update the displayed selected note
+                    const selectedNote = clickedCell.textContent;
+                    rootNote = `${selectedNote}4`;
+                    renderFretboard();
+                    RootNoteDisplay.textContent = rootNote;
+  
+                    
+                }
+            });
+        });
+    </script>
+</body>
+<a href=mobile.html>Mobile</a>
 </html>
