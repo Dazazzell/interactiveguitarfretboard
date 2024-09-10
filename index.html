@@ -241,7 +241,7 @@
         function handleMouseMove(event, fretDiv, midiNote) {
             if (event.buttons > 0) {
                 if (midiNote !== lastNote) {
-                    document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note} / ${midiNote}`;
+                    document.getElementById('noteDisplay').innerText = `${fretDiv.dataset.note} / ${midiNote}`;
                     startNote(midiNote);
                     lastNote = midiNote;
                 }
@@ -250,7 +250,7 @@
 
         function handleTouchStart(event, fretDiv, midiNote) {
             event.preventDefault();
-            document.getElementById('noteDisplay').innerText = `String: ${fretDiv.dataset.string}, Fret: ${fretDiv.dataset.fret}, Note: ${fretDiv.dataset.note} / ${midiNote}`;
+            document.getElementById('noteDisplay').innerText = `${fretDiv.dataset.note} / ${midiNote}`;
             startNote(midiNote);
             lastNote = midiNote;
         }
@@ -309,7 +309,7 @@
                     }
 
                     fretDiv.addEventListener('mousedown', () => {
-                        document.getElementById('noteDisplay').innerText = `String: ${tuningStandard.length - stringIndex}, Fret: ${fret}, Note: ${midiNote} / ${flatNote}`;
+                        document.getElementById('noteDisplay').innerText = `${midiNote} / ${flatNote}`;
                         startNote(midiNote);
                         lastNote = midiNote;
                     });
