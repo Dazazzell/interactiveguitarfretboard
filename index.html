@@ -129,9 +129,6 @@
     <div class="fretboard" id="fretboard"></div>
     <div class="note-display" id="noteDisplay">Press space or click-hold a fret to play the note!</div>
     <div class="inputs" id="inputs">
-    <!-- Existing input elements -->
-</div>
-    <div class="inputs" id="inputs">
 
         
         <label for="fret1">Max Fret 1 Width (px): <input type="number" id="fret1" value="110"></label>
@@ -181,12 +178,6 @@
             height: parseInt(document.getElementById('fretHeight').value) || 40,
         };
 
-    function clearNoteLog() {
-        document.getElementById('noteLog').innerText = '';
-        noteindex=1;
-    } 
-
-
         function getFretWidth(fret) {
             if (fret === 0) {
                 return `${fretDimensions.width[0]}px`;
@@ -219,7 +210,7 @@
             rootNote = document.getElementById('rootNote').value;
             renderFretboard();
         }
- 
+  
 
 function semitonesToInterval(semitones) {
     // Define the names of intervals for 0 to 12 semitones
@@ -268,7 +259,6 @@ function semitonesToInterval(semitones) {
         const synth = new Tone.Synth().toDestination();
         let rootNote = 'C4';
         let ddtrig=true;
-        let noteindex=1;
         let currentNote = null;
         let lastNote = null;
         let ddNote = 80;
@@ -279,13 +269,6 @@ function semitonesToInterval(semitones) {
             }
             currentNote = note;
             synth.triggerAttack(note);
-            fnote = getFlatEquivalent(note);
-            temptext=document.getElementById('noteLog').innerText+`${noteindex}. ${note} / ${fnote}\n`;
-            noteindex++;
-            lines = temptext.split('\n');
-            last12Lines = lines.slice(-12);
-            document.getElementById('noteLog').innerText=last12Lines.join('\n');
-            
         }
 
         function stopNote() {
@@ -455,6 +438,9 @@ function semitonesToInterval(semitones) {
             document.getElementById('highlightFrets').addEventListener('change', updateHighlightFrets);
             document.getElementById('hideRightBorder').addEventListener('change', renderFretboard);
             document.getElementById('rootNote').addEventListener('change', updateRootNote);
+            
+            
+            
         });
     </script>
 
@@ -514,8 +500,7 @@ function semitonesToInterval(semitones) {
             <td>B</td>
         </tr>
     </table>
-    <!-- <button id="clearLogButton">Clear</button> -->
-    <!-- <div id="noteLog"> </div> -->
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const noteTable = document.getElementById('noteTable');
@@ -543,7 +528,6 @@ function semitonesToInterval(semitones) {
                 }
             });
         });
-    document.getElementById('clearLogButton').addEventListener('click', clearNoteLog);
     </script>
 </body>
 </html>
