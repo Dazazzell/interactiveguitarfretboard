@@ -127,7 +127,7 @@
 <body>
     <h1>Interactive Guitar Fretboard</h1>
     <div class="fretboard" id="fretboard"></div>
-    <div class="note-display" id="noteDisplay">Click and hold a fret to play the note!</div>
+    <div class="note-display" id="noteDisplay">Press space or click-hold a fret to play the note!</div>
     <div class="inputs" id="inputs">
 
         
@@ -364,7 +364,8 @@ function semitonesToInterval(semitones) {
                     fretDiv.addEventListener('mousemove', (event) => handleMouseMove(event, fretDiv, midiNote));
                      // New event listener for mouseover
             fretDiv.addEventListener('mouseover', () => {
-                ddNote=midiNote;
+              if (!ddtrig && ddNote!==midiNote) {ddtrig=true;}
+              ddNote=midiNote;
             });
                     fretDiv.addEventListener('mouseup', () => {
                         stopNote();
