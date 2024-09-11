@@ -364,7 +364,7 @@ function semitonesToInterval(semitones) {
                     fretDiv.addEventListener('mousemove', (event) => handleMouseMove(event, fretDiv, midiNote));
                      // New event listener for mouseover
             fretDiv.addEventListener('mouseover', () => {
-              if (!ddtrig && ddNote!==midiNote) {ddtrig=true;}
+              if (!ddtrig && ddNote!==midiNote) {startNote(midiNote);}
               ddNote=midiNote;
             });
                     fretDiv.addEventListener('mouseup', () => {
