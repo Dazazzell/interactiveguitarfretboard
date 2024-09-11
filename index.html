@@ -210,7 +210,7 @@
             rootNote = document.getElementById('rootNote').value;
             renderFretboard();
         }
-
+  
 
 function semitonesToInterval(semitones) {
     // Define the names of intervals for 0 to 12 semitones
@@ -257,9 +257,11 @@ function semitonesToInterval(semitones) {
         }
 
         const synth = new Tone.Synth().toDestination();
-        let rootNote = 'C4'
+        let rootNote = 'C4';
+        let ddtrig=true;
         let currentNote = null;
         let lastNote = null;
+        let ddNote = 80;
 
         function startNote(note) {
             if (currentNote) {
@@ -360,6 +362,10 @@ function semitonesToInterval(semitones) {
                     });
 
                     fretDiv.addEventListener('mousemove', (event) => handleMouseMove(event, fretDiv, midiNote));
+                     // New event listener for mouseover
+            fretDiv.addEventListener('mouseover', () => {
+                ddNote=midiNote;
+            });
                     fretDiv.addEventListener('mouseup', () => {
                         stopNote();
                         lastNote = null;
@@ -397,6 +403,22 @@ function semitonesToInterval(semitones) {
             }
         }
 
+        document.addEventListener('keydown', (event) => {
+                if (ddtrig===true &&  event.code === 'Space') {
+              startNote(ddNote);
+              ddtrig=false;
+                    
+                }
+            });
+
+            document.addEventListener('keyup', (event) => {
+                if (event.code === 'Space') {
+                    stopNote();
+                    ddtrig=true;
+                }
+            });
+
+
         document.addEventListener('DOMContentLoaded', () => {
             // Ensure the audio context is started by a user gesture
             document.body.addEventListener('click', () => {
@@ -415,6 +437,9 @@ function semitonesToInterval(semitones) {
             document.getElementById('highlightFrets').addEventListener('change', updateHighlightFrets);
             document.getElementById('hideRightBorder').addEventListener('change', renderFretboard);
             document.getElementById('rootNote').addEventListener('change', updateRootNote);
+            
+            
+            
         });
     </script>
 
