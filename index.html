@@ -183,6 +183,7 @@
 
     function clearNoteLog() {
         document.getElementById('noteLog').innerText = '';
+        noteindex=1;
     } 
 
 
@@ -267,6 +268,7 @@ function semitonesToInterval(semitones) {
         const synth = new Tone.Synth().toDestination();
         let rootNote = 'C4';
         let ddtrig=true;
+        let noteindex=1;
         let currentNote = null;
         let lastNote = null;
         let ddNote = 80;
@@ -278,7 +280,12 @@ function semitonesToInterval(semitones) {
             currentNote = note;
             synth.triggerAttack(note);
             fnote = getFlatEquivalent(note);
-            document.getElementById('noteLog').innerText+=`${fnote}/${note}\n`;
+            temptext=document.getElementById('noteLog').innerText+`${noteindex}. ${note} / ${fnote}\n`;
+            noteindex++;
+            lines = temptext.split('\n');
+            last12Lines = lines.slice(-12);
+            document.getElementById('noteLog').innerText=last12Lines.join('\n');
+            
         }
 
         function stopNote() {
