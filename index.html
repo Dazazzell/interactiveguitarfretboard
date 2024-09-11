@@ -129,6 +129,9 @@
     <div class="fretboard" id="fretboard"></div>
     <div class="note-display" id="noteDisplay">Press space or click-hold a fret to play the note!</div>
     <div class="inputs" id="inputs">
+    <!-- Existing input elements -->
+</div>
+    <div class="inputs" id="inputs">
 
         
         <label for="fret1">Max Fret 1 Width (px): <input type="number" id="fret1" value="110"></label>
@@ -178,6 +181,11 @@
             height: parseInt(document.getElementById('fretHeight').value) || 40,
         };
 
+    function clearNoteLog() {
+        document.getElementById('noteLog').innerText = '';
+    } 
+
+
         function getFretWidth(fret) {
             if (fret === 0) {
                 return `${fretDimensions.width[0]}px`;
@@ -210,7 +218,7 @@
             rootNote = document.getElementById('rootNote').value;
             renderFretboard();
         }
-  
+ 
 
 function semitonesToInterval(semitones) {
     // Define the names of intervals for 0 to 12 semitones
@@ -269,6 +277,8 @@ function semitonesToInterval(semitones) {
             }
             currentNote = note;
             synth.triggerAttack(note);
+            fnote = getFlatEquivalent(note);
+            document.getElementById('noteLog').innerText+=`${fnote}/${note}\n`;
         }
 
         function stopNote() {
@@ -438,9 +448,6 @@ function semitonesToInterval(semitones) {
             document.getElementById('highlightFrets').addEventListener('change', updateHighlightFrets);
             document.getElementById('hideRightBorder').addEventListener('change', renderFretboard);
             document.getElementById('rootNote').addEventListener('change', updateRootNote);
-            
-            
-            
         });
     </script>
 
@@ -500,7 +507,8 @@ function semitonesToInterval(semitones) {
             <td>B</td>
         </tr>
     </table>
-
+    <button id="clearLogButton">Clear</button>
+    <div id="noteLog"> </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const noteTable = document.getElementById('noteTable');
@@ -528,6 +536,7 @@ function semitonesToInterval(semitones) {
                 }
             });
         });
+    document.getElementById('clearLogButton').addEventListener('click', clearNoteLog);
     </script>
 </body>
 </html>
