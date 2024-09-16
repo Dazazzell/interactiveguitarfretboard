@@ -355,6 +355,8 @@ function semitonesToInterval(semitones) {
                         fretDiv.classList.add('highlight');
                     } else if (fret === specialFret12) {
                         fretDiv.classList.add('fret-12');
+                    } else if (fret === 24) {
+                        fretDiv.classList.add('fret-0');
                     }
 
                     const midiNote = Tone.Frequency(stringNote).transpose(fret).toNote();
