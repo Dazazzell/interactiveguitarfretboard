@@ -150,11 +150,11 @@
         <label>
             Show on Hover:
             <select id="displayOption" style=width:130px;">
-                <option value="numbers" selected>Fret Numbers</option>
-                <option value="intervals">Intervals</option>
-                <option value="notes1">Note Names Flat</option>
-                <option value="notes2">Note Names Sharp</option>
-                <option value="dots">Dots</option>
+                <option value="numbers" selected>1 Fret Numbers</option>
+                <option value="intervals">2 Intervals</option>
+                <option value="notes1">3 Note Names Flat</option>
+                <option value="notes2">4 Note Names Sharp</option>
+                <option value="dots">5 Dot</option>
             </select>
         </label>
         <label>
@@ -441,6 +441,28 @@ function semitonesToInterval(semitones) {
             
             
             
+        });
+        
+        document.addEventListener('keydown', function(event) {
+            // Define valid keys and corresponding values
+            const keyToValueMap = {
+                '1': 'numbers',
+                '2': 'intervals',
+                '3': 'notes1',
+                '4': 'notes2',
+                '5': 'dots'
+            };
+
+            // Check if the pressed key is one of the defined keys
+            if (keyToValueMap.hasOwnProperty(event.key)) {
+                const selectElement = document.getElementById('displayOption');
+                const value = keyToValueMap[event.key];
+
+                // Set the selected value
+                selectElement.value = value;
+                document.getElementById('displayOption').dispatchEvent(new Event('change'));
+                
+            }
         });
     </script>
 
