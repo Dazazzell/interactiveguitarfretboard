@@ -476,9 +476,9 @@ function semitonesToInterval(semitones) {
         });
         
         document.addEventListener('keydown', (event) => {
-        if (event.key === '+' || '=') {
+        if (event.key === '+' || event.key === '=') {
             selectNextOption();
-        } else if (event.key === '-' || '_') {
+        } else if (event.key === '-' || event.key === '_') {
             selectPreviousOption();
         }
     });
