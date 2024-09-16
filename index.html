@@ -127,7 +127,7 @@
 <body>
     <h1>Interactive Guitar Fretboard</h1>
     <div class="fretboard" id="fretboard"></div>
-    <div class="note-display" id="noteDisplay">Press space or click-hold a fret to play the note!</div>
+    <div class="note-display" id="noteDisplay"></div>
     <div class="inputs" id="inputs">
 
         
@@ -148,10 +148,6 @@
             </select>
         </label>
         <label>
-            Hide Frets:
-            <input type="checkbox" id="hideRightBorder" checked>
-        </label>
-        <label>
             Show on Hover:
             <select id="displayOption" style=width:130px;">
                 <option value="numbers" selected>Fret Numbers</option>
@@ -160,6 +156,10 @@
                 <option value="notes2">Note Names Sharp</option>
                 <option value="dots">Dots</option>
             </select>
+        </label>
+        <label>
+            Hide Frets:
+            <input type="checkbox" id="hideRightBorder" checked>
         </label>
 
     </div>
@@ -274,7 +274,7 @@ function semitonesToInterval(semitones) {
         function stopNote() {
             if (currentNote) {
                 synth.triggerRelease();
-                document.getElementById('noteDisplay').innerText = `-`;
+                document.getElementById('noteDisplay').innerText = ``;
                 currentNote = null;
             }
         }
@@ -282,7 +282,7 @@ function semitonesToInterval(semitones) {
         function handleMouseMove(event, fretDiv, midiNote) {
             if (event.buttons > 0) {
                 if (midiNote !== lastNote) {
-                    document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note}`;
+                    //document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note}`;
                     startNote(midiNote);
                     lastNote = midiNote;
                 }
@@ -291,7 +291,7 @@ function semitonesToInterval(semitones) {
 
         function handleTouchStart(event, fretDiv, midiNote) {
             event.preventDefault();
-            document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note}`;
+            //document.getElementById('noteDisplay').innerText = `${midiNote} / ${fretDiv.dataset.note}`;
             startNote(midiNote);
             lastNote = midiNote;
         }
@@ -356,7 +356,7 @@ function semitonesToInterval(semitones) {
                     }
 
                     fretDiv.addEventListener('mousedown', () => {
-                        document.getElementById('noteDisplay').innerText = `${midiNote} / ${flatNote}`;
+                        //document.getElementById('noteDisplay').innerText = `${midiNote} / ${flatNote}`;
                         startNote(midiNote);
                         lastNote = midiNote;
                     });
@@ -469,7 +469,7 @@ function semitonesToInterval(semitones) {
     </style>
 </head>
 <body>
-<p>Root note:</p>
+<p>Root note for intervals:</p>
     <table id="noteTable">
         <tr>
             <td>C</td>
