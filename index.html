@@ -158,6 +158,23 @@
             </select>
         </label>
         <label>
+            Root
+            <select id="rootNoteSel" style=width:130px;">
+                <option value="A" selected>A</option>
+                <option value="A#">A#/Bb</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="C#">C#/Db</option>
+                <option value="D">D</option>
+                <option value="D#">D#/Eb</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="F#">F#/Gb</option>
+                <option value="G">G</option>
+                <option value="G#">G#/Ab</option>
+            </select>
+        </label>
+        <label>
             Hide Frets:
             <input type="checkbox" id="hideRightBorder" checked>
         </label>
@@ -206,8 +223,8 @@
             return noteToFlat[note] || note;
         }
         
-                function updateRootNote() {
-            rootNote = document.getElementById('rootNote').value;
+            function updateRootNote() {
+            rootNote = document.getElementById('rootNoteSel').value+'4';
             renderFretboard();
         }
   
@@ -262,6 +279,7 @@ function semitonesToInterval(semitones) {
         let currentNote = null;
         let lastNote = null;
         let ddNote = 80;
+        let comboBox = document.getElementById('rootNoteSel')
 
         function startNote(note) {
             if (currentNote) {
@@ -295,10 +313,24 @@ function semitonesToInterval(semitones) {
             startNote(midiNote);
             lastNote = midiNote;
         }
+        
+        
+        function selectNextOption() {
+        const currentIndex = comboBox.selectedIndex;
+        const nextIndex = (currentIndex + 1) % comboBox.options.length;
+        comboBox.selectedIndex = nextIndex;
+    }
+
+    function selectPreviousOption() {
+        const currentIndex = comboBox.selectedIndex;
+        const prevIndex = (currentIndex - 1 + comboBox.options.length) % comboBox.options.length;
+        comboBox.selectedIndex = prevIndex;
+    }
 
         function renderFretboard() {
             const fretboard = document.getElementById('fretboard');
             const displayOption = document.getElementById('displayOption').value;
+            
             fretboard.innerHTML = '';
 
             const stringOrder = document.getElementById('stringOrder').value === 'reverse' ? tuningStandard.slice().reverse() : tuningStandard;
@@ -350,7 +382,7 @@ function semitonesToInterval(semitones) {
                     } else if (displayOption === 'intervals') {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
-                        noteSpan.style.color = 'blue';
+                        noteSpan.style.color = 'red';
                         noteSpan.innerText = semitonesToInterval(Tone.Frequency(midiNote).toMidi()-Tone.Frequency(rootNote).toMidi());
                         fretDiv.appendChild(noteSpan);
                     }
@@ -437,11 +469,19 @@ function semitonesToInterval(semitones) {
             document.getElementById('displayOption').addEventListener('change', renderFretboard);
             document.getElementById('highlightFrets').addEventListener('change', updateHighlightFrets);
             document.getElementById('hideRightBorder').addEventListener('change', renderFretboard);
-            document.getElementById('rootNote').addEventListener('change', updateRootNote);
+            document.getElementById('rootNoteSel').addEventListener('change', updateRootNote);
             
             
             
         });
+        
+        document.addEventListener('keydown', (event) => {
+        if (event.key === '+' || '=') {
+            selectNextOption();
+        } else if (event.key === '-' || '_') {
+            selectPreviousOption();
+        }
+    });
         
         document.addEventListener('keydown', function(event) {
             // Define valid keys and corresponding values
@@ -461,6 +501,33 @@ function semitonesToInterval(semitones) {
                 // Set the selected value
                 selectElement.value = value;
                 document.getElementById('displayOption').dispatchEvent(new Event('change'));
+                
+            }
+        });
+        
+        document.addEventListener('keydown', function(event) {
+            // Define valid keys and corresponding values
+            const keyToValueMap = {
+                'a': 'A',
+                'b': 'B',
+                'c': 'C',
+                'd': 'D',
+                'e': 'E',
+                'f': 'F',
+                'g': 'G'
+                
+            };
+
+            // Check if the pressed key is one of the defined keys
+            if (keyToValueMap.hasOwnProperty(event.key)) {
+                const selectElement = document.getElementById('rootNoteSel');
+                const value = keyToValueMap[event.key];
+
+                // Set the selected value
+                selectElement.value = value;
+                document.getElementById('rootNoteSel').dispatchEvent(new Event('change'));
+                rootNote = `${value}4`;
+                renderFretboard();
                 
             }
         });
@@ -490,66 +557,4 @@ function semitonesToInterval(semitones) {
         }
     </style>
 </head>
-<body>
-<p>Root note for intervals:</p>
-    <table id="noteTable">
-        <tr>
-            <td>C</td>
-            <td>Db</td>
-            <td>D</td>
-            <td>Eb</td>
-            <td>E</td>
-            <td>F</td>
-            <td>Gb</td>
-            <td>G</td>
-            <td>Ab</td>
-            <td>A</td>
-            <td>Bb</td>
-            <td>B</td>
-        </tr>
-        <tr>
-            <td>C</td>
-            <td>C#</td>
-            <td>D</td>
-            <td>D#</td>
-            <td>E</td>
-            <td>F</td>
-            <td>F#</td>
-            <td>G</td>
-            <td>G#</td>
-            <td>A</td>
-            <td>A#</td>
-            <td>B</td>
-        </tr>
-    </table>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const noteTable = document.getElementById('noteTable');
-            const selectedNoteDisplay = document.getElementById('selectedNote');
-
-            noteTable.addEventListener('click', (event) => {
-                if (event.target.tagName === 'TD') {
-                    // Remove selected class from any previously selected cell
-                    const previouslySelected = document.querySelector('td.selected');
-                    if (previouslySelected) {
-                        previouslySelected.classList.remove('selected');
-                    }
-
-                    // Add selected class to the clicked cell
-                    const clickedCell = event.target;
-                    clickedCell.classList.add('selected');
-
-                    // Update the displayed selected note
-                    const selectedNote = clickedCell.textContent;
-                    rootNote = `${selectedNote}4`;
-                    renderFretboard();
-                    RootNoteDisplay.textContent = rootNote;
-  
-                    
-                }
-            });
-        });
-    </script>
-</body>
 </html>
