@@ -376,12 +376,12 @@ function semitonesToInterval(semitones) {
                     } else if (displayOption === 'notes1') {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
-                        noteSpan.innerText = flatNote;
+                        noteSpan.innerText = flatNote.slice(0, -1);
                         fretDiv.appendChild(noteSpan);
                     } else if (displayOption === 'notes2') {
                         const noteSpan = document.createElement('span');
                         noteSpan.classList.add('note', 'show-notes');
-                        noteSpan.innerText = midiNote;
+                        noteSpan.innerText = midiNote.slice(0, -1);
                         fretDiv.appendChild(noteSpan);
                     } else if (displayOption === 'intervals') {
                         const noteSpan = document.createElement('span');
