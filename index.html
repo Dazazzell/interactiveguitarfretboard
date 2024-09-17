@@ -147,7 +147,8 @@
                 <option value="option2">10</option>
             </select>
         </label>
-        <label for="fretsnumber">Frets: <input type="number" id="fretsnumber" value="21"></label>
+        <label for="startfretnumber">First fret: <input type="number" id="startfretnumber" value="0"></label>
+        <label for="fretsnumber">Last fret: <input type="number" id="fretsnumber" value="21"></label>
         <label>
             Show on Hover:
             <select id="displayOption" style=width:130px;">
@@ -277,6 +278,7 @@ function semitonesToInterval(semitones) {
         const synth = new Tone.Synth().toDestination();
         let rootNote = 'C4';
         let ddtrig=true;
+        let ddstartfret=0;
         let currentNote = null;
         let lastNote = null;
         let ddNote = 80;
@@ -331,8 +333,8 @@ function semitonesToInterval(semitones) {
         function renderFretboard() {
             const fretboard = document.getElementById('fretboard');
             const displayOption = document.getElementById('displayOption').value;
-            frets=document.getElementById('fretsnumber').value;
-            
+            ddstartfret=document.getElementById('startfretnumber').value*1;
+            frets=document.getElementById('fretsnumber').value*1;
             fretboard.innerHTML = '';
 
             const stringOrder = document.getElementById('stringOrder').value === 'reverse' ? tuningStandard.slice().reverse() : tuningStandard;
@@ -340,8 +342,8 @@ function semitonesToInterval(semitones) {
             stringOrder.forEach((stringNote, stringIndex) => {
                 const stringDiv = document.createElement('div');
                 stringDiv.classList.add('string');
-
-                for (let fret = 0; fret <= frets; fret++) {
+                        
+                for (let fret = ddstartfret; fret <= frets; fret++) {
                     const fretDiv = document.createElement('div');
                     fretDiv.classList.add('fret');
                     fretDiv.style.width = getFretWidth(fret);
@@ -475,6 +477,7 @@ function semitonesToInterval(semitones) {
             document.getElementById('hideRightBorder').addEventListener('change', renderFretboard);
             document.getElementById('rootNoteSel').addEventListener('change', updateRootNote);
             document.getElementById('fretsnumber').addEventListener('change', renderFretboard);
+            document.getElementById('startfretnumber').addEventListener('change', renderFretboard);
             
             
             
